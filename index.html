@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>床眠いの歌单 - YUKA SONGBOOK</title>
+    <style>
+        /* 全局重置与基础样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            color: #ffffff;
+            /* 替换为你的本地背景图 */
+            background-image: url('雪景.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        /* 页面暗色遮罩，让文字更清晰 */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.4); /* 稍微调浅了一点遮罩，以免雪景太暗 */
+            z-index: -1;
+        }
+
+        /* 顶部导航栏 */
+        .top-bar {
+            position: absolute;
+            top: 20px;
+            left: 40px;
+            right: 40px;
+            display: flex;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: #ff4e4e;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 14px;
+        }
+
+        .logo-sub {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+            letter-spacing: 1px;
+            margin-left: 8px;
+            text-transform: uppercase;
+        }
+
+        /* 主要内容容器 */
+        .main-container {
+            display: flex;
+            gap: 30px;
+            width: 100%;
+            max-width: 1200px;
+            z-index: 1;
+        }
+
+        /* 左侧个人信息卡片 */
+        .profile-card {
+            width: 320px;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            flex-shrink: 0;
+            height: fit-content;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        /* 自定义滚动条 */
+        .profile-card::-webkit-scrollbar {
+            width: 6px;
+        }
+        .profile-card::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+        }
+
+        .profile-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 20px;
+        }
+
+        .avatar {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: #eee;
+            margin-bottom: 16px;
+            object-fit: cover;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .name-romaji {
+            font-size: 12px;
+            letter-spacing: 2px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 6px;
+        }
+
+        .name-main {
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .name-sub {
+            font-family: 'Georgia', serif;
+            font-size: 22px;
+            font-style: italic;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 8px;
+        }
+
+        .tagline {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .bio-section {
+            font-size: 13px;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .bio-section h3 {
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .bio-section p {
+            margin-bottom: 12px;
+        }
+
+        .bio-section a {
+            color: #ff7b7b;
+            text-decoration: none;
+            margin-right: 6px;
+        }
+
+        .bio-section a:hover {
+            text-decoration: underline;
+        }
+
+        /* 右侧歌曲目录主面板 */
+        .main-panel {
+            flex-grow: 1;
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 36px;
+            display: flex;
+            flex-direction: column;
+            min-height: 500px;
+        }
+
+        .panel-header {
+            margin-bottom: 30px;
+        }
+
+        .panel-subtitle {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .panel-title {
+            font-size: 32px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+        }
+
+        .panel-title::after {
+            content: '.';
+            color: #ff4e4e;
+            font-size: 40px;
+            line-height: 1;
+            margin-left: 4px;
+        }
+
+        /* 歌单本体区域 - 完全透明的灰色 */
+        .playlist-body {
+            flex-grow: 1;
+            background: rgba(255, 255, 255, 0.03); /* 极其通透的灰色 */
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            text-align: center;
+        }
+
+        /* 歌单头部信息（如：全部曲目 0首收录） */
+        .playlist-header-info {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            margin-bottom: 20px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+        }
+
+        /* 空状态展示 */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            margin-top: auto;
+            margin-bottom: auto;
+        }
+
+        .empty-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #ff7b7b;
+            font-size: 24px;
+        }
+
+        .empty-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .empty-desc {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 900px) {
+            .main-container {
+                flex-direction: column;
+            }
+            .profile-card {
+                width: 100%;
+                max-height: none;
+            }
+            .top-bar {
+                position: relative;
+                top: 0;
+                left: 0;
+                right: 0;
+                margin-bottom: 20px;
+                justify-content: center;
+            }
+            body {
+                padding-top: 20px;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 顶部栏 -->
+    <div class="top-bar">
+        <div class="logo-area">
+            <div class="logo-icon">🎵</div>
+            <span>床眠いの歌单</span>
+            <span class="logo-sub">YUKA SONGBOOK</span>
+        </div>
+    </div>
+
+    <!-- 主内容区 -->
+    <div class="main-container">
+        
+        <!-- 左侧个人卡片 -->
+        <div class="profile-card">
+            <div class="profile-header">
+                <!-- 替换为你的本地头像 -->
+                <img src="头像.jpg" alt="Avatar" class="avatar">
+                <div class="name-romaji">Y U K A N E M U I</div>
+                <div class="name-main">床眠い</div>
+                <div class="name-sub">yuka</div>
+                <div class="tagline">一个喜欢唱歌的人。</div>
+            </div>
+
+            <div class="bio-section">
+                <h3>自我介绍</h3>
+                <p>泥嚎，我是床眠い（地板好困），读作yu ka ne mu i，叫yuka就好，网易☁️同名，很高兴认识你，希望你天天开心(≧3≦)</p>
+                
+                <p>如果想寻找我的录播：<br>
+                <a href="#">@Akaねむい</a> <a href="#">@直播留档员</a> <a href="#">@时眠Bili</a> <a href="#">@kuku大王66</a></p>
+                
+                <p>如果想寻找我的切片：<br>
+                <a href="#">@くもねむい</a> <a href="#">@夢遊バスタブ</a> <a href="#">@你好眠い</a></p>
+                
+                <p>谢谢你愿意听我唱歌，我不是虚拟主播，只是喜欢唱歌的二次元小女孩><（能说是皮套人吗），给我推歌也非常欢迎！！</p>
+                
+                <p>我自己有在打工所以不用担心我这边的，直播就是因为想唱歌和交朋友(๑˃̵ᴗ˂̵)，你们大家把钱留着给自己花就好啦，如果喜欢听歌或者是想听歌就是最好的礼物！！！</p>
+            </div>
+        </div>
+
+        <!-- 右侧主面板 -->
+        <div class="main-panel">
+            <div class="panel-header">
+                <div class="panel-subtitle">SONG COLLECTION</div>
+                <div class="panel-title">歌曲目录</div>
+            </div>
+
+            <!-- 歌单本体区域 -->
+            <div class="playlist-body">
+                <div class="playlist-header-info">
+                    <span>☰ 全部曲目</span>
+                    <span>0 首收录</span>
+                </div>
+                
+                <div class="empty-state">
+                    <div class="empty-icon">♪</div>
+                    <div class="empty-title">歌单正在整理</div>
+                    <div class="empty-desc">等歌曲收录后，就可以在这里挑歌啦。</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>
