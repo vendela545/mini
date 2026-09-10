@@ -1,1 +1,656 @@
 # mini
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>床眠い的歌单 - YUKA SONGBOOK</title>
+    <style>
+        :root {
+            /* 暗色主题配色，适配图三的雪夜背景 */
+            --bg-glass: rgba(20, 22, 28, 0.75);
+            --border-glass: rgba(255, 255, 255, 0.1);
+            --text-main: #f5f5f5;
+            --text-muted: #a0a0a0;
+            --accent-color: #d9564a; /* 保留了原图一左上角的红色点缀 */
+            --hover-bg: rgba(255, 255, 255, 0.05);
+            --font-sans: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            --font-serif: 'Times New Roman', Times, serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            color: var(--text-main);
+            /* 【背景替换点 1】图三：雪夜背景 */
+            background-image: url('雪景.png'); 
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* 主容器 - 玻璃拟态效果 */
+        .app-container {
+            width: 100%;
+            max-width: 1200px;
+            background: var(--bg-glass);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-glass);
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            height: 90vh; /* 固定高度，内部滚动 */
+        }
+
+        /* 顶部导航 */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border-glass);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 24px;
+            height: 24px;
+            background-color: var(--accent-color);
+            border-radius: 6px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 14px;
+        }
+
+        .header-title {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .header-subtitle {
+            font-family: var(--font-serif);
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            font-size: 14px;
+        }
+
+        .header-right {
+            font-size: 14px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .header-right:hover {
+            color: var(--text-main);
+        }
+
+        /* 内容布局 */
+        .content-layout {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* 左侧边栏 */
+        .sidebar {
+            width: 300px;
+            padding: 40px 24px;
+            border-right: 1px solid var(--border-glass);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-y: auto;
+        }
+
+        .avatar-container {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 2px solid var(--border-glass);
+            margin-bottom: 20px;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.9); /* 让线稿图能看清 */
+        }
+
+        /* 【头像替换点 2】图二：线稿头像 */
+        .avatar-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .sidebar h1 {
+            font-size: 14px;
+            letter-spacing: 4px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .sidebar .name-jp {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .sidebar .name-en {
+            font-family: var(--font-serif);
+            font-size: 36px;
+            font-style: italic;
+            margin-bottom: 16px;
+        }
+
+        .sidebar .tagline {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 30px;
+        }
+
+        .bio {
+            font-size: 13px;
+            line-height: 1.8;
+            color: var(--text-muted);
+            text-align: left;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .bio p {
+            margin-bottom: 12px;
+        }
+
+        .link-original {
+            margin-top: auto;
+            font-size: 13px;
+            color: var(--accent-color);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .link-original:hover {
+            text-decoration: underline;
+        }
+
+        /* 右侧主内容区 */
+        .main-area {
+            flex: 1;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .main-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 24px;
+        }
+
+        .main-title-area p {
+            font-size: 12px;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .main-title-area h2 {
+            font-size: 32px;
+            font-weight: 900;
+            letter-spacing: 2px;
+        }
+
+        .main-title-area h2 span {
+            color: var(--accent-color);
+        }
+
+        .random-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border-glass);
+            color: var(--text-main);
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .random-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* 搜索和过滤区 */
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .search-box {
+            width: 100%;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border-glass);
+            padding: 12px 16px 12px 40px;
+            border-radius: 8px;
+            color: var(--text-main);
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .search-box input:focus {
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .search-box input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        .filters {
+            display: flex;
+            gap: 12px;
+        }
+
+        .filters select {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border-glass);
+            color: var(--text-main);
+            padding: 8px 12px;
+            border-radius: 6px;
+            outline: none;
+            font-size: 13px;
+            flex: 1;
+            cursor: pointer;
+        }
+
+        .filters select option {
+            background: #222;
+        }
+
+        .reset-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 13px;
+        }
+
+        .reset-btn:hover {
+            color: var(--text-main);
+        }
+
+        /* 歌曲列表区 */
+        .song-list-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            border-top: 1px solid var(--border-glass);
+            padding-top: 16px;
+            overflow: hidden;
+        }
+
+        .list-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+            padding: 0 10px;
+        }
+
+        .song-list {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        /* 自定义滚动条 */
+        .song-list::-webkit-scrollbar {
+            width: 6px;
+        }
+        .song-list::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .song-list::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
+
+        /* 歌曲条目 */
+        .song-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 10px;
+            border-radius: 8px;
+            transition: background 0.2s;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .song-item:hover {
+            background: var(--hover-bg);
+        }
+
+        .song-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .song-title-jp {
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .song-title-cn {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* 移动端适配 */
+        @media (max-width: 768px) {
+            .content-layout {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid var(--border-glass);
+                padding: 20px;
+            }
+            .avatar-container {
+                width: 100px;
+                height: 100px;
+            }
+            .main-area {
+                padding: 20px;
+            }
+            .main-title-area h2 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <!-- 顶部导航 -->
+    <header>
+        <div class="header-left">
+            <div class="logo-icon">♪</div>
+            <div class="header-title">床眠い的歌单</div>
+            <div class="header-subtitle">YUKA SONGBOOK</div>
+        </div>
+        <div class="header-right">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            管理歌单
+        </div>
+    </header>
+
+    <!-- 主体内容 -->
+    <div class="content-layout">
+        <!-- 左侧个人资料 -->
+        <aside class="sidebar">
+            <div class="avatar-container">
+                <!-- 请将 src 替换为你的图二文件路径，例如 "avatar.jpg" -->
+                <img src="avatar.jpg" alt="Yuka Avatar">
+            </div>
+            <h1>YUKA NEMUI</h1>
+            <div class="name-jp">床眠い</div>
+            <div class="name-en">yuka</div>
+            <div class="tagline">一个喜欢唱歌的人。</div>
+            
+            <div class="bio">
+                <p>你好呀，我是 yuka。</p>
+                <p>床眠い，也就是「地板好困」。</p>
+                <p>喜欢唱歌，也喜欢二次元。</p>
+                <p>直播是因为想唱歌，也想在这里认识朋友。</p>
+                <p>很高兴认识你，希望你天天开心。</p>
+            </div>
+
+            <a href="https://yukak.com" target="_blank" class="link-original">
+                原歌单 · yukak.com
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+            </a>
+        </aside>
+
+        <!-- 右侧歌单目录 -->
+        <main class="main-area">
+            <div class="main-header">
+                <div class="main-title-area">
+                    <p>SONG COLLECTION</p>
+                    <h2>歌曲目录<span>。</span></h2>
+                </div>
+                <button class="random-btn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
+                    随机选歌
+                </button>
+            </div>
+
+            <div class="controls">
+                <div class="search-box">
+                    <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <input type="text" placeholder="想听什么？搜一首歌">
+                </div>
+                <div class="filters">
+                    <select><option>全部风格</option></select>
+                    <select><option>全部语种</option></select>
+                    <select><option>全部歌曲</option></select>
+                    <button class="reset-btn">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v6h6"></path><path d="M3 13a9 9 0 1 0 3-7.7L3 8"></path></svg>
+                        重置
+                    </button>
+                </div>
+            </div>
+
+            <div class="song-list-container">
+                <div class="list-header">
+                    <span>全部曲目</span>
+                    <!-- 这里的数字可以根据实际歌单数量修改 -->
+                    <span>24 首收录</span>
+                </div>
+                
+                <!-- 歌单列表 -->
+                <div class="song-list">
+                    <!-- 【歌单数据】此处提取了图四中前部分歌曲作为示例，你可以按照这个格式继续往下添加 -->
+                    <div class="song-item">
+                        <div class="song-info">
+                            <span class="song-title-jp">タメイキ</span>
+                            <span class="song-title-cn">叹息</span>
+                        </div>
+                    </div>
+                    <div class="song-item">
+                        <div class="song-info">
+                            <span class="song-title-jp">クリーム</span>
+                            <span class="song-title-cn">奶油</span>
+                        </div>
+                    </div>
+                    <div class="song-item">
+                        <div class="song-info">
+                            <span class="song-title-jp">ブルーベリー</span>
+                            <span class="song-title-cn">蓝莓</span>
+                        </div>
+                    </div>
+                    <div class="song-item">
+                        <div class="song-info">
+                            <span class="song-title-jp">愛を伝えたい</span>
+                            <span class="song-title-cn">想传达爱意</span>
+                        </div>
+                    </div>
+                    <div class="song-item">
+                        <div class="song-info">
+                            <span class="song-title-jp">チョコレート</span>
+                            <span class="song-title-cn">巧克力</span>
+                        </div>
+                    </div>
+                    <div class="song-item">
+                        <div class="song-info">
+                            <span class="song-title-jp">恋の病</span>
+                            <span class="song-title-cn">恋爱病</span>
+                        </div>
+                    </div>
+                    <div class="song-item">
+                        <div class="song-info">
+                            <span class="song-title-jp">夜に駆ける</span>
+                            <span class="song-title-cn">奔向夜晚</span>
+                        </div>
+                    </div>
+                    <div class="song-item">
+                        <div class="song-info">
+                            <span class="song-title-jp">アンコール</span>
+                            <span class="song-title-cn">安可</span>
+                        </div>
+                    </div>
+                    <div class="song-item">
+                        <div class="song-info">
+                            <span class="song-title-jp">ロキ</span>
+                            <span class="song-title-cn">洛基</span>
+                        </div>
+                    </div>
+                    <div class="song-item">
+                        <div class="song-info">
+                            <span class="song-title-jp">シャルル</span>
+                            <span class="song-title-cn">夏尔</span>
+                        </div>
+                    </div>
+                    <div class="song-item">
+                        <div class="song-info">
+                            <span class="song-title-jp">命に嫌われている</span>
+                            <span class="song-title-cn">被生命厌恶着</span>
+                        </div>
+                    </div>
+                    <div class="song-item">
+                        <div class="song-info">
+                            <span class="song-title-jp">花に亡霊</span>
+                            <span class="song-title-cn">花中亡灵</span>
+                        </div>
+                    </div>
+                    <div class="song-item">
+                        <div class="song-info">
+                            <span class="song-title-jp">ただ君に晴れ</span>
+                            <span class="song-title-cn">只是向你放晴</span>
+                        </div>
+                    </div>
+                    <div class="song-item">
+                        <div class="song-info">
+                            <span class="song-title-jp">だから僕は音楽を辞めた</span>
+                            <span class="song-title-cn">所以我放弃了音乐</span>
+                        </div>
+                    </div>
+                    <div class="song-item">
+                        <div class="song-info">
+                            <span class="song-title-jp">乙女解剖</span>
+                            <span class="song-title-cn">少女解剖</span>
+                        </div>
+                    </div>
+                    <div class="song-item">
+                        <div class="song-info">
+                            <span class="song-title-jp">ロマンスの約束</span>
+                            <span class="song-title-cn">浪漫的约定</span>
+                        </div>
+                    </div>
+                    <div class="song-item">
+                        <div class="song-info">
+                            <span class="song-title-jp">愛して愛して愛して</span>
+                            <span class="song-title-cn">爱我爱我爱我</span>
+                        </div>
+                    </div>
+                    <div class="song-item">
+                        <div class="song-info">
+                            <span class="song-title-jp">きゅうくらりん</span>
+                            <span class="song-title-cn">晕头转向</span>
+                        </div>
+                    </div>
+                    <div class="song-item">
+                        <div class="song-info">
+                            <span class="song-title-jp">ゴーストルール</span>
+                            <span class="song-title-cn">幽灵法则</span>
+                        </div>
+                    </div>
+                    <div class="song-item">
+                        <div class="song-info">
+                            <span class="song-title-jp">ドライフラワー</span>
+                            <span class="song-title-cn">干花</span>
+                        </div>
+                    </div>
+                    <div class="song-item">
+                        <div class="song-info">
+                            <span class="song-title-jp">ベテルギウス</span>
+                            <span class="song-title-cn">参宿四</span>
+                        </div>
+                    </div>
+                    <div class="song-item">
+                        <div class="song-info">
+                            <span class="song-title-jp">群青</span>
+                            <span class="song-title-cn">群青</span>
+                        </div>
+                    </div>
+                    <div class="song-item">
+                        <div class="song-info">
+                            <span class="song-title-jp">Lemon</span>
+                            <span class="song-title-cn">柠檬</span>
+                        </div>
+                    </div>
+                    <div class="song-item">
+                        <div class="song-info">
+                            <span class="song-title-jp">残酷な天使のテーゼ</span>
+                            <span class="song-title-cn">残酷天使的行动纲领</span>
+                        </div>
+                    </div>
+                    <!-- 你可以按此格式继续添加图四中的其他歌曲 -->
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+</body>
+</html>
